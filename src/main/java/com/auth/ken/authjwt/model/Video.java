@@ -30,6 +30,10 @@ public class Video {
     private String thumbnailurl;
     private List<Comment> commentList = new CopyOnWriteArrayList<>();
 
+    public List<UserCommentInfo> userInfos = new CopyOnWriteArrayList<>();
+
+
+
     public void incrementLikes(){
         likes.incrementAndGet();
     }
@@ -53,4 +57,5 @@ public class Video {
     public void addComment(Comment comment) {
         commentList.add(comment);
     }
+    public void addUserInfo(UserCommentInfo userComment){userInfos.add(userComment); }
 }

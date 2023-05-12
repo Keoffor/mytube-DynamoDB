@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -22,5 +23,6 @@ public class VideoDTO {
     private Integer viewCount;
     private Integer likeCount;
     private Integer disLikeCount;
+
 
 }

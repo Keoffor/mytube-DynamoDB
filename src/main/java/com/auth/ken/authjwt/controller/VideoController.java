@@ -1,8 +1,6 @@
 package com.auth.ken.authjwt.controller;
 
-import com.auth.ken.authjwt.dto.CommentDto;
-import com.auth.ken.authjwt.dto.VideoDTO;
-import com.auth.ken.authjwt.dto.VideoUploadResponse;
+import com.auth.ken.authjwt.dto.*;
 import com.auth.ken.authjwt.model.Comment;
 import com.auth.ken.authjwt.service.VideoService;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +56,9 @@ public class VideoController {
     }
 
     @PostMapping(value = "/{videoId}/comment")
-    @ResponseStatus(HttpStatus.OK)
-    public void addComment(@PathVariable String videoId, @RequestBody CommentDto commentDto){
-        videoService.addComment(videoId, commentDto);
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserResponse addComment(@PathVariable String videoId, @RequestBody CommentDto commentDto){
+      return   videoService.addComment(videoId, commentDto);
     }
     @GetMapping(value = "/{videoId}/comments")
     public List<CommentDto> getAllComment(@PathVariable String videoId){
@@ -69,7 +67,7 @@ public class VideoController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<VideoDTO> getAllVideos(){
+    public List<VideoDTO> getAllVideo(){
         return videoService.getAllVideos();
     }
 
