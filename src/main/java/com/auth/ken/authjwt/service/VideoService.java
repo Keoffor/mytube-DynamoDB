@@ -141,39 +141,51 @@ public class VideoService {
         Video video = getVideoById(videoId);
         //retrieve the current user
         User user = userService.getCurrentUser();
-        UserResponse userResponse = new UserResponse();
+        UserResponse userResponse;
+        if (video.userInfos == null) {
+            UserCommentInfo userInfos = mapToUserCommentInfo(user);
+            video.addUserInfo(userInfos);
+            Comment comment = new Comment();
+            comment.setText(commentDto.getCommentText());
+            comment.setAuthorid(commentDto.getAuthorId());
+            comment.setUserName(userInfos.getName());
+            comment.setPicture(userInfos.getPicture());
+            comment.setId(userInfos.getId());
+            video.addComment(comment);
+            videoRepository.save(video);
+            return mapToUserResponse(comment);
+        } else {
 
-        Comment response = video.userInfos.stream().filter(u -> u.getId().equals(user.getId())).findFirst()
-                .map(m -> {
-                    //add user comment
-                    Comment comment = new Comment();
-                    comment.setText(commentDto.getCommentText());
-                    comment.setAuthorid(commentDto.getAuthorId());
-                    comment.setUserName(m.getName());
-                    comment.setPicture(m.getPicture());
-                    comment.setId(m.getId());
-                    video.addComment(comment);
-                    videoRepository.save(video);
-                    return comment;
-                }).orElseGet(()->{
-                    UserCommentInfo  userInfos = mapToUserComment(user);
-                    video.addUserInfo(userInfos);
-                    Comment comment = new Comment();
-                    comment.setText(commentDto.getCommentText());
-                    comment.setAuthorid(commentDto.getAuthorId());
-                    comment.setUserName(userInfos.getName());
-                    comment.setPicture(userInfos.getPicture());
-                    comment.setId(userInfos.getId());
-                    video.addComment(comment);
-                    videoRepository.save(video);
-                    return comment;
-                });
-          userResponse.setName(response.getUserName());
-          userResponse.setId(response.getId());
-          userResponse.setPicture(response.getPicture());
 
-          return userResponse;
-    }
+            Comment response = video.userInfos.stream().filter(u -> u.getId().equals(user.getId())).findFirst()
+                    .map(m -> {
+                        //add user comment
+                        Comment comment = new Comment();
+                        comment.setText(commentDto.getCommentText());
+                        comment.setAuthorid(commentDto.getAuthorId());
+                        comment.setUserName(m.getName());
+                        comment.setPicture(m.getPicture());
+                        video.addComment(comment);
+                        videoRepository.save(video);
+                        return comment;
+                    }).orElseGet(() -> {
+                        UserCommentInfo userInfos = mapToUserCommentInfo(user);
+                        video.addUserInfo(userInfos);
+                        Comment comment = new Comment();
+                        comment.setText(commentDto.getCommentText());
+                        comment.setAuthorid(commentDto.getAuthorId());
+                        comment.setUserName(userInfos.getName());
+                        comment.setPicture(userInfos.getPicture());
+                        comment.setId(userInfos.getId());
+                        video.addComment(comment);
+                        videoRepository.save(video);
+                        return comment;
+                    });
+                userResponse = mapToUserResponse(response);
+         }
+            return userResponse;
+        }
+
 
     public List<CommentDto> getAllComments(String videoId) {
 
@@ -191,13 +203,21 @@ public class VideoService {
         return commentDto;
     }
 
-    private UserCommentInfo mapToUserComment(User user){
+    private UserCommentInfo mapToUserCommentInfo(User user){
         UserCommentInfo userCommentInfo = new UserCommentInfo();
         userCommentInfo.setEmail(user.getEmailAddress());
         userCommentInfo.setName(user.getName());
         userCommentInfo.setId(user.getId());
         userCommentInfo.setPicture(user.getPicture());
         return userCommentInfo;
+    }
+
+    private UserResponse mapToUserResponse(Comment comment){
+        UserResponse userResponse = new UserResponse();
+        userResponse.setName(comment.getUserName());
+        userResponse.setId(comment.getId());
+        userResponse.setPicture(comment.getPicture());
+        return userResponse;
     }
 
     public List<VideoDTO> getAllVideos() {
