@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -138,35 +139,40 @@ public class VideoService {
     public UserResponse addComment(String videoId, CommentDto commentDto) {
         //get video by id
         Video video = getVideoById(videoId);
-        UserResponse userResponse = new UserResponse();
         //retrieve the current user
         User user = userService.getCurrentUser();
-        //map current user to video property - userCommentInfo
-        UserCommentInfo userInfos = mapToUserComment(user);
-        video.addUserInfo(userInfos);
-        videoRepository.save(video);
+        UserResponse userResponse = new UserResponse();
 
-        Optional<UserCommentInfo> userCommentInfo = video.getUserInfos().stream().filter(u ->
-                u.getId().equals(user.getId())).findFirst();
-        if(userCommentInfo.isPresent()){
-            userResponse.setPicture(userCommentInfo.get().getPicture());
-            userResponse.setId(userCommentInfo.get().getId());
-            userResponse.setName(userCommentInfo.get().getName());
-            //add user comment
-            Comment comment = new Comment();
-            comment.setText(commentDto.getCommentText());
-            comment.setAuthorid(commentDto.getAuthorId());
-            comment.setUserName(userResponse.getName());
-            comment.setPicture(userResponse.getPicture());
-            video.addComment(comment);
-            videoRepository.save(video);
+        Comment response = video.userInfos.stream().filter(u -> u.getId().equals(user.getId())).findFirst()
+                .map(m -> {
+                    //add user comment
+                    Comment comment = new Comment();
+                    comment.setText(commentDto.getCommentText());
+                    comment.setAuthorid(commentDto.getAuthorId());
+                    comment.setUserName(m.getName());
+                    comment.setPicture(m.getPicture());
+                    comment.setId(m.getId());
+                    video.addComment(comment);
+                    videoRepository.save(video);
+                    return comment;
+                }).orElseGet(()->{
+                    UserCommentInfo  userInfos = mapToUserComment(user);
+                    video.addUserInfo(userInfos);
+                    Comment comment = new Comment();
+                    comment.setText(commentDto.getCommentText());
+                    comment.setAuthorid(commentDto.getAuthorId());
+                    comment.setUserName(userInfos.getName());
+                    comment.setPicture(userInfos.getPicture());
+                    comment.setId(userInfos.getId());
+                    video.addComment(comment);
+                    videoRepository.save(video);
+                    return comment;
+                });
+          userResponse.setName(response.getUserName());
+          userResponse.setId(response.getId());
+          userResponse.setPicture(response.getPicture());
 
-            return userResponse;
-
-        }else {
-            throw new RuntimeException("user does not exist"+userResponse.getId());
-        }
-
+          return userResponse;
     }
 
     public List<CommentDto> getAllComments(String videoId) {
