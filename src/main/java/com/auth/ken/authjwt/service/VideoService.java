@@ -11,10 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,7 +149,7 @@ public class VideoService {
             comment.setAuthorid(commentDto.getAuthorId());
             comment.setUserName(userInfos.getName());
             comment.setPicture(userInfos.getPicture());
-            comment.setId(userInfos.getId());
+            comment.setPostedDateAndTime(LocalDateTime.now());
             video.addComment(comment);
             videoRepository.save(video);
             return mapToUserResponse(comment);
@@ -165,6 +164,7 @@ public class VideoService {
                         comment.setAuthorid(commentDto.getAuthorId());
                         comment.setUserName(m.getName());
                         comment.setPicture(m.getPicture());
+                        comment.setPostedDateAndTime(LocalDateTime.now());
                         video.addComment(comment);
                         videoRepository.save(video);
                         return comment;
@@ -176,7 +176,7 @@ public class VideoService {
                         comment.setAuthorid(commentDto.getAuthorId());
                         comment.setUserName(userInfos.getName());
                         comment.setPicture(userInfos.getPicture());
-                        comment.setId(userInfos.getId());
+                        comment.setPostedDateAndTime(LocalDateTime.now());
                         video.addComment(comment);
                         videoRepository.save(video);
                         return comment;
@@ -191,7 +191,9 @@ public class VideoService {
 
         Video video = getVideoById(videoId);
         List<Comment> commentList = video.getCommentList();
-         return commentList.stream().map(this::mapToCommentDto).collect(Collectors.toList());
+         return commentList.stream().map(this::mapToCommentDto)
+                 .sorted(Comparator.comparing(CommentDto::getPostedDateAndTime).reversed())
+                 .collect(Collectors.toList());
     }
 
     private CommentDto mapToCommentDto(Comment comment) {
@@ -200,6 +202,7 @@ public class VideoService {
         commentDto.setAuthorId(comment.getAuthorid());
         commentDto.setUserName(comment.getUserName());
         commentDto.setPicture(comment.getPicture());
+        commentDto.setPostedDateAndTime(comment.getPostedDateAndTime());
         return commentDto;
     }
 
@@ -213,10 +216,13 @@ public class VideoService {
     }
 
     private UserResponse mapToUserResponse(Comment comment){
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd' T 'HH:mm:ss.SSSSSS");
         UserResponse userResponse = new UserResponse();
         userResponse.setName(comment.getUserName());
         userResponse.setId(comment.getId());
         userResponse.setPicture(comment.getPicture());
+        String formattedDate = comment.getPostedDateAndTime().format(dateFormat);
+        userResponse.setShowTime(LocalDateTime.parse(formattedDate,dateFormat));
         return userResponse;
     }
 

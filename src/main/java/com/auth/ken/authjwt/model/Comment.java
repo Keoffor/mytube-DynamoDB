@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +19,5 @@ public class Comment {
     private Integer dislikeCount;
     private String userName;
     private String picture;
+    private LocalDateTime postedDateAndTime;
 }
