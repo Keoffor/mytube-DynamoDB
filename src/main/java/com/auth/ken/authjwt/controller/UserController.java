@@ -39,7 +39,7 @@ public class UserController {
     @GetMapping("all-users")
     @ResponseStatus(HttpStatus.OK)
     public List<User> getAllusers(){
-       return userRepository.findAll();
+       return (List<User>) userRepository.findAll();
     }
     @PostMapping(value = "/unsubscribe/{userId}")
     @ResponseStatus(HttpStatus.OK)

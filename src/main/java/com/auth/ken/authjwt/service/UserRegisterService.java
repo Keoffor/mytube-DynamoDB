@@ -15,7 +15,9 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +52,16 @@ public class UserRegisterService {
                         .picture(userInfoDTO.getPicture()).build();
             }else {
             User user = new User();
+            Set<String> subscribedToUsers = new HashSet<>();
+            subscribedToUsers.add("subscribersToUsers");
+            Set<String> subscribers = new HashSet<>();
+            subscribers.add("subscribers");
+            Set<String> historyVideo = new HashSet<>();
+            historyVideo.add("historyVideo");
+            Set<String> likedVideos = new HashSet<>();
+            likedVideos.add("likedVideos");
+            Set<String> dislikedVideo = new HashSet<>();
+            dislikedVideo.add("dislikedVideos");
 
             user.setFirstName(userInfoDTO.getGivenName());
             user.setLastName(userInfoDTO.getFamilyName());
@@ -58,16 +70,18 @@ public class UserRegisterService {
             user.setSub(userInfoDTO.getSub());
             user.setName(userInfoDTO.getName());
             user.setPicture(userInfoDTO.getPicture());
+            user.setSubcribedToUsers(subscribedToUsers);
+            user.setSubscribers(subscribers);
+            user.setVideoHistory(historyVideo);
+            user.setDislikedVideos(dislikedVideo);
+            user.setLikedVideos(likedVideos);
             userRepository.save(user);
                return UserResponse.builder().id(user.getId())
                         .name(user.getName())
                         .picture(user.getPicture()).build();
-
-
-
             }
         }catch (Exception ex){
-            throw  new RuntimeException("Exception occur while registering user"+ ex);
+            throw  new RuntimeException("Exception occur while registering user "+ ex);
         }
 
         //fetch the details and save user to the database

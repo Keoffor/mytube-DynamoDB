@@ -20,9 +20,9 @@ public class VideoDTO {
     private String videourl;
     private VideoStatus videoStatus;
     private String thumbnailurl;
-    private Integer viewCount;
-    private Integer likeCount;
-    private Integer disLikeCount;
+    private Long viewCount;
+    private Long likeCount;
+    private Long disLikeCount;
 
 
 }

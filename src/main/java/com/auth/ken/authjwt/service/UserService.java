@@ -1,5 +1,8 @@
 package com.auth.ken.authjwt.service;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.auth.ken.authjwt.model.User;
 import com.auth.ken.authjwt.model.Video;
 import com.auth.ken.authjwt.repository.UserRepository;
@@ -57,6 +60,7 @@ public class UserService {
     }
 
     public void addVideoToHistory(String videoId) {
+//        DynamoDBMapper mapper = new DynamoDBMapper(client);
         User currentUser = getCurrentUser();
         currentUser.addVideoToHistory(videoId);
         userRepository.save(currentUser);

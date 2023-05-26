@@ -1,10 +1,10 @@
 package com.auth.ken.authjwt.service;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.auth.ken.authjwt.dto.*;
-import com.auth.ken.authjwt.model.Comment;
-import com.auth.ken.authjwt.model.User;
-import com.auth.ken.authjwt.model.UserCommentInfo;
-import com.auth.ken.authjwt.model.Video;
+import com.auth.ken.authjwt.model.*;
 import com.auth.ken.authjwt.repository.VideoRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,16 +19,35 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class VideoService {
+
     private final S3Service s3Service;
     private final VideoRepository videoRepository;
     private final UserService userService;
 
     public VideoUploadResponse uploadVideos(MultipartFile multipartFile){
+
        String videourl = s3Service.uploadFile(multipartFile);
+       Set<String> tags = new HashSet<>();
+       List<Comment> comments = new ArrayList<>();
+       comments.add(new Comment("01","great video", "john", 1,0,
+		"foo","bright", LocalDateTime.now()));
+        		List<UserCommentInfo> userInfo = new ArrayList<>();
+		userInfo.add(new UserCommentInfo("02", "johnfoo","johndoes","does",
+				"photo","email"));
+       tags.add("dance");
        var video = new Video();
        video.setVideourl(videourl);
-       var savedVideo = videoRepository.save(video);
-       return new VideoUploadResponse(savedVideo.getId(), savedVideo.getVideourl());
+       video.setUserId("userId");
+       video.setTitle("title");
+       video.setStatus(VideoStatus.PUBLIC);
+       video.setDescription("description");
+       video.setThumbnailurl("thumbnailurl");
+       video.setCommentList(comments);
+       video.setUserInfos(userInfo);
+       video.setTags(tags);
+       video.setPostedDateAndTime(LocalDateTime.now());
+       videoRepository.save(video);
+       return new VideoUploadResponse(video.getId(), video.getVideourl());
     }
 
     public VideoDTO editVideo(VideoDTO videoDTO) {
@@ -123,9 +142,9 @@ public class VideoService {
         videoDTO.setTags(videoById.getTags());
         videoDTO.setThumbnailurl(videoById.getThumbnailurl());
         videoDTO.setVideourl(videoById.getVideourl());
-        videoDTO.setLikeCount(videoById.getLikes().get());
-        videoDTO.setDisLikeCount(videoById.getDislikes().get());
-        videoDTO.setViewCount(videoById.getViewCount().get());
+        videoDTO.setLikeCount(videoById.getLikes());
+        videoDTO.setDisLikeCount(videoById.getDislikes());
+        videoDTO.setViewCount(videoById.getViewCount());
         return videoDTO;
     }
 
@@ -136,6 +155,10 @@ public class VideoService {
 
 
     public UserResponse addComment(String videoId, CommentDto commentDto) {
+        UUID uuid = UUID.randomUUID();
+        //parse uuid object to string
+        String uuidString = uuid.toString();
+
         //get video by id
         Video video = getVideoById(videoId);
         //retrieve the current user
@@ -145,6 +168,7 @@ public class VideoService {
             UserCommentInfo userInfos = mapToUserCommentInfo(user);
             video.addUserInfo(userInfos);
             Comment comment = new Comment();
+            comment.setId(uuidString);
             comment.setText(commentDto.getCommentText());
             comment.setAuthorid(commentDto.getAuthorId());
             comment.setUserName(userInfos.getName());
@@ -160,6 +184,7 @@ public class VideoService {
                     .map(m -> {
                         //add user comment
                         Comment comment = new Comment();
+                        comment.setId(uuidString);
                         comment.setText(commentDto.getCommentText());
                         comment.setAuthorid(commentDto.getAuthorId());
                         comment.setUserName(m.getName());
@@ -228,7 +253,7 @@ public class VideoService {
 
     public List<VideoDTO> getAllVideos() {
 
-         List<Video> result = videoRepository.findAll();
+         List<Video> result = (List<Video>) videoRepository.findAll();
         return result.stream().map(this::mapToVideoDTO).collect(Collectors.toList());
     }
 }
