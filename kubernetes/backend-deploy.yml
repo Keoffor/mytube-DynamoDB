@@ -31,7 +31,7 @@ spec:
     spec:
 
       containers:
-      - name: mytube-app
+      - name: mytube-backend-app
         image: keoffor/mytube:v1
         ports:
         - name: backend-port
