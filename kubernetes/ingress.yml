@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: backendissuer
+spec:
+  tls:
+    - hosts:
+        - utube.kendoc.vip  # Replace with your cluster DNS name
+      secretName: self-signed-tls
+  rules:
+    - host: utube.kendoc.vip # Replace with your cluster DNS name
+      http:
+        paths:
+          - backend:
+              service:
+                name: backend-service
+                port:
+                  number: 80
+            path: /api
+            pathType: Prefix

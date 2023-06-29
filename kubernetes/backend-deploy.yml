@@ -32,7 +32,7 @@ spec:
 
       containers:
       - name: mytube-backend-app
-        image: keoffor/mytube:v1
+        image: keoffor/mytube-backend:v1
         ports:
         - name: backend-port
           containerPort: 8080

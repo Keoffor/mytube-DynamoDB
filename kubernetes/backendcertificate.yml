@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: backendcert
+  namespace: backend
+spec:
+  secretName: backend
+  issuerRef:
+    name: backendissuer
+    kind: ClusterIssuer
+  commonName: utube.kendoc.vip
+  dnsNames:
+    - utube.kendoc.vip

@@ -18,6 +18,7 @@ import java.util.Set;
 @RestController
 @RequestMapping(value = "/api/user")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class UserController {
     private final UserRegisterService userRegisterService;
     private final UserService userService;
@@ -39,7 +40,8 @@ public class UserController {
     @GetMapping("all-users")
     @ResponseStatus(HttpStatus.OK)
     public List<User> getAllusers(){
-       return (List<User>) userRepository.findAll();
+
+        return (List<User>) userRepository.findAll();
     }
     @PostMapping(value = "/unsubscribe/{userId}")
     @ResponseStatus(HttpStatus.OK)

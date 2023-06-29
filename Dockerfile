@@ -1,12 +1,3 @@
-#FROM openjdk:17-alpine
-#ENV AWS_ACCESS_KEY_ID=value1
-#ENV AWS_SECRET_ACCESS_KEY=value2
-#ENV AWS_REGION=us-east-1
-#VOLUME /tmp
-#COPY target/*.jar app.jar
-#ENTRYPOINT ["java", "-jar", "/app.jar"]
-#EXPOSE 8181
-# Use an official OpenJDK as the base image
 FROM openjdk:17-alpine
 
 # Set the working directory inside the container
@@ -29,7 +20,7 @@ EXPOSE 8080
 # Set environment variables for AWS credentials and region
 #ENV AWS_ACCESS_KEY_ID=AKIA43BJOXSG4F3Z2SG3
 #ENV AWS_SECRET_ACCESS_KEY=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
-#ENV AWS_REGION=us-east-1
+#ENV AWS_REGION=us-east-2
 
 # Set environment variable for DynamoDB local endpoint (optional if you're using AWS DynamoDB service)
 ENV AWS_DYNAMODB_ENDPOINT=dynamodb.us-east-1.amazonaws.com
