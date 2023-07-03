@@ -6,14 +6,6 @@ WORKDIR /app
 # Copy the compiled Spring Boot JAR file to the working directory
 COPY target/*.jar app.jar
 
-## Install AWS CLI for DynamoDB local (optional if you're using AWS DynamoDB service)
-#RUN apt-get update && apt-get install -y \
-#    unzip \
-#    && rm -rf /var/lib/apt/lists/*
-#RUN curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-#RUN unzip awscli-bundle.zip
-#RUN ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-
 # Expose the port on which the Spring Boot app will run
 EXPOSE 8080
 

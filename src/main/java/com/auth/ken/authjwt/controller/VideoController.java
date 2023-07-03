@@ -17,7 +17,7 @@ import java.util.List;
 public class VideoController {
     private final VideoService videoService;
 
-    @PostMapping
+    @PostMapping(value = "/upload")
     @ResponseStatus(HttpStatus.CREATED)
     public VideoUploadResponse uploadFile(@RequestParam("file") MultipartFile file){
       return videoService.uploadVideos(file);
